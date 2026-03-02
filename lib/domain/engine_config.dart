@@ -37,13 +37,13 @@ class EngineConfig {
       case DifficultyLevel.easy:
         return const EngineConfig(
           skillLevel: 1,
-          moveTimeMs: 500,
+          moveTimeMs: 20,
           difficulty: DifficultyLevel.easy,
         );
       case DifficultyLevel.medium:
         return const EngineConfig(
           skillLevel: 5,
-          moveTimeMs: 1000,
+          moveTimeMs: 500,
           difficulty: DifficultyLevel.medium,
         );
       case DifficultyLevel.hard:
@@ -54,7 +54,7 @@ class EngineConfig {
         );
       case DifficultyLevel.expert:
         return const EngineConfig(
-          skillLevel: 16,
+          skillLevel: 15,
           moveTimeMs: 2000,
           difficulty: DifficultyLevel.expert,
         );

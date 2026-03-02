@@ -272,7 +272,6 @@ class _DifficultyTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final config = EngineConfig.fromDifficulty(level);
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -303,10 +302,6 @@ class _DifficultyTile extends StatelessWidget {
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                     fontSize: 15,
                   ),
-                ),
-                Text(
-                  'Skill ${config.skillLevel} · ${config.moveTimeMs}ms think time',
-                  style: const TextStyle(color: Colors.white38, fontSize: 12),
                 ),
               ],
             ),

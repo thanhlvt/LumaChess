@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:squares/squares.dart';
 import 'package:enterprise_chess/domain/engine_config.dart';
 import 'package:enterprise_chess/domain/match_provider.dart';
-import 'package:enterprise_chess/presentation/analysis_screen.dart';
 import 'package:enterprise_chess/presentation/utils/chess_coordinate_utils.dart';
 import 'package:enterprise_chess/presentation/utils/chess_board_builder.dart';
 import 'services/sound_service.dart';
@@ -133,11 +132,6 @@ class _PvEScreenState extends ConsumerState<PvEScreen> {
       soundService.playLose();
     }
 
-    // Capture FEN + move history at game-over moment for analysis.
-    final controller = ref.read(matchProvider.notifier);
-    final fenHistory = List<String>.from(controller.fenHistory);
-    final moveHistory = List<String>.from(controller.moveHistory);
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       showDialog<void>(
@@ -162,17 +156,6 @@ class _PvEScreenState extends ConsumerState<PvEScreen> {
             Navigator.of(context).pop(); // close dialog
             Navigator.of(context).pop(); // back through setup
             Navigator.of(context).pop(); // back to main menu
-          },
-          onAnalyze: () {
-            Navigator.of(context).pop(); // close dialog
-            Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => AnalysisScreen(
-                  fenHistory: fenHistory,
-                  moveHistory: moveHistory,
-                ),
-              ),
-            );
           },
         ),
       );
@@ -312,14 +295,12 @@ class _GameOverDialog extends StatelessWidget {
   final String subtitle;
   final VoidCallback onRestart;
   final VoidCallback onMenu;
-  final VoidCallback onAnalyze;
 
   const _GameOverDialog({
     required this.title,
     required this.subtitle,
     required this.onRestart,
     required this.onMenu,
-    required this.onAnalyze,
   });
 
   @override
@@ -347,23 +328,7 @@ class _GameOverDialog extends StatelessWidget {
               subtitle,
               style: const TextStyle(color: Colors.white60, fontSize: 15),
             ),
-            const SizedBox(height: 20),
-            // ── Analyze button ────────────────────────────────────────────
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: onAnalyze,
-                icon: const Icon(Icons.analytics_outlined, size: 18),
-                label: const Text('Phân tích ván đấu'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.amber,
-                  side: const BorderSide(color: Colors.amber),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 28),
             Row(
               children: [
                 Expanded(

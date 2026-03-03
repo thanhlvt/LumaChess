@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:squares/squares.dart';
 import 'package:enterprise_chess/domain/engine_config.dart';
 import 'package:enterprise_chess/domain/match_provider.dart';
+import 'package:enterprise_chess/domain/user_settings_provider.dart';
 import 'package:enterprise_chess/presentation/utils/chess_coordinate_utils.dart';
 import 'package:enterprise_chess/presentation/utils/chess_board_builder.dart';
 import 'services/sound_service.dart';
@@ -182,10 +183,15 @@ class _PvEScreenState extends ConsumerState<PvEScreen> {
   @override
   Widget build(BuildContext context) {
     final matchState = ref.watch(matchProvider);
+    final userSettings = ref.watch(userSettingsProvider);
     final domainMoves = ref.read(matchProvider.notifier).legalMoves;
     final legalMoves = ChessCoordinateUtils.getLegalMoves(domainMoves);
     final orientation = widget.playerSide == 'black' ? Squares.black : Squares.white;
-    final boardState = ChessBoardBuilder.buildBoardState(matchState.fen, orientation: orientation);
+    final boardState = ChessBoardBuilder.buildBoardState(
+      matchState.fen, 
+      orientation: orientation,
+      lastMove: matchState.lastMove,
+    );
 
     final isUserTurn = widget.playerSide == 'white'
         ? matchState.isWhiteTurn
@@ -240,6 +246,14 @@ class _PvEScreenState extends ConsumerState<PvEScreen> {
             tooltip: 'Restart',
             onPressed: _isEngineThinking ? null : _restartGame,
           ),
+          // ── Settings ──────────────────────────────────────────────────
+          IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: 'Settings',
+            onPressed: () {
+              Navigator.of(context).pushNamed('/settings');
+            },
+          ),
         ],
       ),
       body: Stack(
@@ -251,8 +265,16 @@ class _PvEScreenState extends ConsumerState<PvEScreen> {
               child: BoardController(
                 state: boardState,
                 playState: playState,
-                pieceSet: PieceSet.merida(),
-                theme: BoardTheme.blueGrey,
+                pieceSet: userSettings.pieceSet,
+                theme: userSettings.theme,
+                markerTheme: MarkerTheme.basic.copyWith(
+                  piece: (context, size, colour) => Container(
+                    decoration: BoxDecoration(
+                      color: Colors.red.withValues(alpha: 0.6),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
                 moves: legalMoves,
                 onMove: _onMove,
                 promotionBehaviour: PromotionBehaviour.autoPremove,

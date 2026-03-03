@@ -194,11 +194,21 @@ class MatchController extends Notifier<MatchState> {
     _legalMovesCache = null;
     _moveHistoryCache = null;
 
-    // Detect capture: the last history entry has a 'captured' piece if any.
+    // Detect last move + capture
     bool lastMoveWasCapture = false;
+    Map<String, dynamic>? lastMove;
     if (_chess.history.isNotEmpty) {
-      final lastMove = _chess.history.last.move;
-      lastMoveWasCapture = lastMove.captured != null;
+      final chessHistory = _chess.history;
+      lastMoveWasCapture = chessHistory.last.move.captured != null;
+      final lastM = chessHistory.last.move;
+      
+      // Grab algebraic 'from' and 'to' properties directly from the move
+      if (lastM.fromAlgebraic.isNotEmpty && lastM.toAlgebraic.isNotEmpty) {
+        lastMove = {
+          'from': lastM.fromAlgebraic,
+          'to': lastM.toAlgebraic,
+        };
+      }
     }
 
     // canUndo: PvE needs ≥2 half-moves (engine+user pair); PvP needs ≥1.
@@ -216,6 +226,7 @@ class MatchController extends Notifier<MatchState> {
       playerSide: _playerSide,
       lastMoveWasCapture: lastMoveWasCapture,
       canUndo: canUndo,
+      lastMove: lastMove,
     );
   }
 }

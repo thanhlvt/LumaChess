@@ -18,6 +18,9 @@ class MatchState {
   /// True if there is at least one move to undo.
   final bool canUndo;
 
+  /// The last move played ('from', 'to', etc). Used for board animations.
+  final Map<String, dynamic>? lastMove;
+
   const MatchState({
     required this.fen,
     this.isWhiteTurn = true,
@@ -28,6 +31,7 @@ class MatchState {
     this.playerSide = 'white',
     this.lastMoveWasCapture = false,
     this.canUndo = false,
+    this.lastMove,
   });
 
   MatchState copyWith({
@@ -40,6 +44,7 @@ class MatchState {
     String? playerSide,
     bool? lastMoveWasCapture,
     bool? canUndo,
+    Map<String, dynamic>? lastMove,
   }) {
     return MatchState(
       fen: fen ?? this.fen,
@@ -51,6 +56,7 @@ class MatchState {
       playerSide: playerSide ?? this.playerSide,
       lastMoveWasCapture: lastMoveWasCapture ?? this.lastMoveWasCapture,
       canUndo: canUndo ?? this.canUndo,
+      lastMove: lastMove ?? this.lastMove,
     );
   }
 }

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:squares/squares.dart';
 import 'package:enterprise_chess/domain/match_provider.dart';
+import 'package:enterprise_chess/domain/user_settings_provider.dart';
 import 'package:enterprise_chess/presentation/utils/chess_coordinate_utils.dart';
 import 'package:enterprise_chess/presentation/utils/chess_board_builder.dart';
 import 'services/sound_service.dart';
+import 'settings_screen.dart';
 
 /// Two-player local game screen.
 /// Both sides are user-controlled. The board flips after each move so the
@@ -90,12 +92,17 @@ class _PvPScreenState extends ConsumerState<PvPScreen> {
   @override
   Widget build(BuildContext context) {
     final matchState = ref.watch(matchProvider);
+    final userSettings = ref.watch(userSettingsProvider);
     final domainMoves = ref.read(matchProvider.notifier).legalMoves;
     final legalMoves = ChessCoordinateUtils.getLegalMoves(domainMoves);
     // Board flips to always show current player's perspective
     final orientWhite = matchState.isWhiteTurn;
     final orientation = orientWhite ? Squares.white : Squares.black;
-    final boardState = ChessBoardBuilder.buildBoardState(matchState.fen, orientation: orientation);
+    final boardState = ChessBoardBuilder.buildBoardState(
+      matchState.fen, 
+      orientation: orientation,
+      lastMove: matchState.lastMove,
+    );
 
     final playState = matchState.isGameOver ? PlayState.finished : PlayState.ourTurn;
 
@@ -133,6 +140,18 @@ class _PvPScreenState extends ConsumerState<PvPScreen> {
                   );
             },
           ),
+          // ── Settings ──────────────────────────────────────────────────
+          IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: 'Settings',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const SettingsScreen(),
+                ),
+              );
+            },
+          ),
         ],
       ),
       body: Center(
@@ -141,8 +160,16 @@ class _PvPScreenState extends ConsumerState<PvPScreen> {
           child: BoardController(
             state: boardState,
             playState: playState,
-            pieceSet: PieceSet.merida(),
-            theme: BoardTheme.blueGrey,
+            pieceSet: userSettings.pieceSet,
+            theme: userSettings.theme,
+            markerTheme: MarkerTheme.basic.copyWith(
+              piece: (context, size, colour) => Container(
+                decoration: BoxDecoration(
+                  color: Colors.red.withValues(alpha: 0.6),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
             moves: legalMoves,
             onMove: _onMove,
             promotionBehaviour: PromotionBehaviour.autoPremove,

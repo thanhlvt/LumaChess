@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:enterprise_chess/domain/game_config.dart';
 import 'game_setup_screen.dart';
 import 'pvp_screen.dart';
+import 'settings_screen.dart';
 
 /// The first screen the user sees.
 /// Lets them choose between playing vs the computer or a two-player local game.
@@ -83,6 +84,18 @@ class MainMenuScreen extends ConsumerWidget {
             ),
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => const SettingsScreen(),
+            ),
+          );
+        },
+        backgroundColor: const Color(0xFF283593),
+        foregroundColor: Colors.white,
+        child: const Icon(Icons.settings),
       ),
     );
   }

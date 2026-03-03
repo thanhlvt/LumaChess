@@ -1,9 +1,14 @@
 import 'package:squares/squares.dart';
+import 'package:enterprise_chess/presentation/utils/chess_coordinate_utils.dart';
 
 class ChessBoardBuilder {
   /// Builds a [BoardState] from a FEN string.
   /// Needs to provide the [orientation] because it can differ in PvE vs PvP.
-  static BoardState buildBoardState(String fen, {required int orientation}) {
+  static BoardState buildBoardState(
+    String fen, {
+    required int orientation,
+    Map<String, dynamic>? lastMove,
+  }) {
     if (fen.isEmpty) return BoardState.empty();
     
     final fenParts = fen.split(' ');
@@ -25,6 +30,23 @@ class ChessBoardBuilder {
         ? Squares.black 
         : Squares.white;
         
-    return BoardState(board: board, turn: turn, orientation: orientation);
+    int? lastFrom;
+    int? lastTo;
+    if (lastMove != null) {
+      final fromAlg = lastMove['from'] as String?;
+      final toAlg = lastMove['to'] as String?;
+      if (fromAlg != null && toAlg != null) {
+        lastFrom = ChessCoordinateUtils.algebraicToSquareIndex(fromAlg);
+        lastTo = ChessCoordinateUtils.algebraicToSquareIndex(toAlg);
+      }
+    }
+        
+    return BoardState(
+      board: board, 
+      turn: turn, 
+      orientation: orientation,
+      lastFrom: lastFrom,
+      lastTo: lastTo,
+    );
   }
 }

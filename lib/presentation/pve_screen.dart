@@ -6,7 +6,10 @@ import 'package:enterprise_chess/domain/match_provider.dart';
 import 'package:enterprise_chess/domain/user_settings_provider.dart';
 import 'package:enterprise_chess/presentation/utils/chess_coordinate_utils.dart';
 import 'package:enterprise_chess/presentation/utils/chess_board_builder.dart';
+import 'package:enterprise_chess/domain/game_history_provider.dart';
+import 'package:enterprise_chess/domain/game_history.dart';
 import 'services/sound_service.dart';
+import 'game_review_screen.dart';
 
 /// Player-vs-Engine game screen.
 ///
@@ -30,10 +33,12 @@ class PvEScreen extends ConsumerStatefulWidget {
 class _PvEScreenState extends ConsumerState<PvEScreen> {
   bool _isEngineThinking = false;
   bool _gameOverDialogShown = false;
+  late GameHistory? _savedHistory;
 
   @override
   void initState() {
     super.initState();
+    _savedHistory = null;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final controller = ref.read(matchProvider.notifier);
       controller.startGame(
@@ -121,10 +126,14 @@ class _PvEScreenState extends ConsumerState<PvEScreen> {
     }
   }
 
-  void _onGameOver(bool isCheckmate, {required bool isPlayerWin, required bool isDraw}) {
+  void _onGameOver(
+    bool isCheckmate, {
+    required bool isPlayerWin,
+    required bool isDraw,
+  }) async {
     _gameOverDialogShown = true;
     final soundService = ref.read(soundServiceProvider);
-    
+
     if (isDraw) {
       soundService.playWin();
     } else if (isPlayerWin) {
@@ -132,6 +141,29 @@ class _PvEScreenState extends ConsumerState<PvEScreen> {
     } else {
       soundService.playLose();
     }
+
+    // Save history
+    final controller = ref.read(matchProvider.notifier);
+    String resultStr = isDraw
+        ? 'Draw'
+        : (isPlayerWin ? 'Player Wins' : 'CPU Wins');
+    final p1 = widget.playerSide == 'white'
+        ? 'Player'
+        : 'CPU (${EngineConfig.labelFor(widget.engineConfig.difficulty)})';
+    final p2 = widget.playerSide == 'black'
+        ? 'Player'
+        : 'CPU (${EngineConfig.labelFor(widget.engineConfig.difficulty)})';
+
+    final history = GameHistory.create(
+      mode: 'PvE',
+      player1: p1,
+      player2: p2,
+      result: resultStr,
+      pgn: controller.pgn,
+    );
+
+    await ref.read(gameHistoryProvider.notifier).saveGame(history);
+    _savedHistory = history;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -142,16 +174,24 @@ class _PvEScreenState extends ConsumerState<PvEScreen> {
           title: isDraw
               ? 'Draw 🤝'
               : isPlayerWin
-                  ? '🎉 Chúc mừng!\nBạn đã thắng!'
-                  : '💪 Cố lên!\nLần sau sẽ tốt hơn!',
+              ? '🎉 Chúc mừng!\nBạn đã thắng!'
+              : '💪 Cố lên!\nLần sau sẽ tốt hơn!',
           subtitle: isDraw
               ? 'A balanced game!'
               : isPlayerWin
-                  ? 'You outplayed the engine!'
-                  : 'The engine got you this time.',
+              ? 'You outplayed the engine!'
+              : 'The engine got you this time.',
           onRestart: () {
             Navigator.of(context).pop(); // close dialog
             _restartGame();
+          },
+          onReview: () {
+            Navigator.of(context).pop(); // close dialog
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (_) => GameReviewScreen(gameHistory: _savedHistory!),
+              ),
+            );
           },
           onMenu: () {
             Navigator.of(context).pop(); // close dialog
@@ -186,9 +226,11 @@ class _PvEScreenState extends ConsumerState<PvEScreen> {
     final userSettings = ref.watch(userSettingsProvider);
     final domainMoves = ref.read(matchProvider.notifier).legalMoves;
     final legalMoves = ChessCoordinateUtils.getLegalMoves(domainMoves);
-    final orientation = widget.playerSide == 'black' ? Squares.black : Squares.white;
+    final orientation = widget.playerSide == 'black'
+        ? Squares.black
+        : Squares.white;
     final boardState = ChessBoardBuilder.buildBoardState(
-      matchState.fen, 
+      matchState.fen,
       orientation: orientation,
       lastMove: matchState.lastMove,
     );
@@ -200,8 +242,8 @@ class _PvEScreenState extends ConsumerState<PvEScreen> {
     final playState = matchState.isGameOver
         ? PlayState.finished
         : _isEngineThinking || !isUserTurn
-            ? PlayState.theirTurn
-            : PlayState.ourTurn;
+        ? PlayState.theirTurn
+        : PlayState.ourTurn;
 
     final diffLabel = EngineConfig.labelFor(widget.engineConfig.difficulty);
 
@@ -222,10 +264,14 @@ class _PvEScreenState extends ConsumerState<PvEScreen> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('vs Computer',
-                style: TextStyle(color: Colors.white, fontSize: 16)),
-            Text(diffLabel,
-                style: const TextStyle(color: Colors.white54, fontSize: 12)),
+            const Text(
+              'vs Computer',
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
+            Text(
+              diffLabel,
+              style: const TextStyle(color: Colors.white54, fontSize: 12),
+            ),
           ],
         ),
         actions: [
@@ -316,18 +362,22 @@ class _GameOverDialog extends StatelessWidget {
   final String title;
   final String subtitle;
   final VoidCallback onRestart;
+  final VoidCallback onReview;
   final VoidCallback onMenu;
 
   const _GameOverDialog({
     required this.title,
     required this.subtitle,
     required this.onRestart,
+    required this.onReview,
     required this.onMenu,
   });
 
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      alignment: Alignment.bottomCenter, // Prevent hiding the board
+      insetPadding: const EdgeInsets.all(16).copyWith(bottom: 32),
       backgroundColor: const Color(0xFF1E1E2E),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
@@ -360,12 +410,27 @@ class _GameOverDialog extends StatelessWidget {
                       foregroundColor: Colors.white70,
                       side: const BorderSide(color: Colors.white24),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                    child: const Text('Main Menu'),
+                    child: const Text('Menu'),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: onReview,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text('Review'),
+                  ),
+                ),
+                const SizedBox(width: 8),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: onRestart,
@@ -373,9 +438,10 @@ class _GameOverDialog extends StatelessWidget {
                       backgroundColor: Colors.amber,
                       foregroundColor: Colors.black,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                    child: const Text('Play Again'),
+                    child: const Text('Again'),
                   ),
                 ),
               ],

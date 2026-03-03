@@ -8,15 +8,9 @@ class UserSettings {
   final BoardTheme theme;
   final PieceSet pieceSet;
 
-  const UserSettings({
-    required this.theme,
-    required this.pieceSet,
-  });
+  const UserSettings({required this.theme, required this.pieceSet});
 
-  UserSettings copyWith({
-    BoardTheme? theme,
-    PieceSet? pieceSet,
-  }) {
+  UserSettings copyWith({BoardTheme? theme, PieceSet? pieceSet}) {
     return UserSettings(
       theme: theme ?? this.theme,
       pieceSet: pieceSet ?? this.pieceSet,
@@ -40,7 +34,7 @@ class UserSettingsNotifier extends Notifier<UserSettings> {
 
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
-    
+
     // Load Theme
     final themeName = prefs.getString(_themeKey);
     BoardTheme theme = BoardTheme.blueGrey;
@@ -75,6 +69,7 @@ class UserSettingsNotifier extends Notifier<UserSettings> {
   }
 }
 
-final userSettingsProvider = NotifierProvider<UserSettingsNotifier, UserSettings>(() {
-  return UserSettingsNotifier();
-});
+final userSettingsProvider =
+    NotifierProvider<UserSettingsNotifier, UserSettings>(() {
+      return UserSettingsNotifier();
+    });

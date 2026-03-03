@@ -10,10 +10,10 @@ class ChessBoardBuilder {
     Map<String, dynamic>? lastMove,
   }) {
     if (fen.isEmpty) return BoardState.empty();
-    
+
     final fenParts = fen.split(' ');
     final placement = fenParts[0];
-    
+
     final board = <String>[];
     for (final char in placement.runes) {
       final s = String.fromCharCode(char);
@@ -25,11 +25,11 @@ class ChessBoardBuilder {
         board.add(s);
       }
     }
-    
-    final turn = (fenParts.length > 1 && fenParts[1] == 'b') 
-        ? Squares.black 
+
+    final turn = (fenParts.length > 1 && fenParts[1] == 'b')
+        ? Squares.black
         : Squares.white;
-        
+
     int? lastFrom;
     int? lastTo;
     if (lastMove != null) {
@@ -40,10 +40,10 @@ class ChessBoardBuilder {
         lastTo = ChessCoordinateUtils.algebraicToSquareIndex(toAlg);
       }
     }
-        
+
     return BoardState(
-      board: board, 
-      turn: turn, 
+      board: board,
+      turn: turn,
       orientation: orientation,
       lastFrom: lastFrom,
       lastTo: lastTo,

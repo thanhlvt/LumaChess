@@ -10,7 +10,6 @@ final soundServiceProvider = Provider<SoundService>((ref) => SoundService());
 class SoundService {
   final _players = <String, AudioPlayer>{};
 
-
   /// Play the move sound (piece placed without capture).
   Future<void> playMove() => _play('move.mp3');
 

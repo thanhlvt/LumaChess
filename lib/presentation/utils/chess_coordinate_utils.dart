@@ -23,11 +23,13 @@ class ChessCoordinateUtils {
       final key = '${m['from']}${m['to']}';
       if (seen.contains(key)) continue;
       seen.add(key);
-      result.add(Move(
-        from: algebraicToSquareIndex(m['from']!),
-        to: algebraicToSquareIndex(m['to']!),
-        promo: null,
-      ));
+      result.add(
+        Move(
+          from: algebraicToSquareIndex(m['from']!),
+          to: algebraicToSquareIndex(m['to']!),
+          promo: null,
+        ),
+      );
     }
     return result;
   }

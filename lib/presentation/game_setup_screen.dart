@@ -12,11 +12,7 @@ class GameSetupScreen extends ConsumerStatefulWidget {
   final String? initialSide;
   final String? initialDifficulty;
 
-  const GameSetupScreen({
-    super.key,
-    this.initialSide,
-    this.initialDifficulty,
-  });
+  const GameSetupScreen({super.key, this.initialSide, this.initialDifficulty});
 
   @override
   ConsumerState<GameSetupScreen> createState() => _GameSetupScreenState();
@@ -32,16 +28,19 @@ class _GameSetupScreenState extends ConsumerState<GameSetupScreen> {
   @override
   void initState() {
     super.initState();
-    
+
     _selectedSide = 'white';
-    if (widget.initialSide != null && ['white', 'random', 'black'].contains(widget.initialSide)) {
+    if (widget.initialSide != null &&
+        ['white', 'random', 'black'].contains(widget.initialSide)) {
       _selectedSide = widget.initialSide!;
     }
 
     _selectedDifficulty = DifficultyLevel.medium;
     if (widget.initialDifficulty != null) {
       try {
-        _selectedDifficulty = DifficultyLevel.values.firstWhere((e) => e.name == widget.initialDifficulty);
+        _selectedDifficulty = DifficultyLevel.values.firstWhere(
+          (e) => e.name == widget.initialDifficulty,
+        );
       } catch (_) {}
     }
   }
@@ -84,10 +83,9 @@ class _GameSetupScreenState extends ConsumerState<GameSetupScreen> {
 
   void _startGame() {
     // Resolve 'random' here so both domain and UI use the same resolved value
-    final resolvedSide =
-        _selectedSide == 'random'
-            ? (Random().nextBool() ? 'white' : 'black')
-            : _selectedSide;
+    final resolvedSide = _selectedSide == 'random'
+        ? (Random().nextBool() ? 'white' : 'black')
+        : _selectedSide;
 
     final config = GameConfig(
       mode: GameMode.pve,
@@ -163,13 +161,16 @@ class _GameSetupScreenState extends ConsumerState<GameSetupScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: _sideOptions
-                              .map((opt) => _SideCard(
-                                    value: opt['value']!,
-                                    label: opt['label']!,
-                                    icon: opt['icon']!,
-                                    isSelected: _selectedSide == opt['value'],
-                                    onTap: () => _saveSidePreference(opt['value']!),
-                                  ))
+                              .map(
+                                (opt) => _SideCard(
+                                  value: opt['value']!,
+                                  label: opt['label']!,
+                                  icon: opt['icon']!,
+                                  isSelected: _selectedSide == opt['value'],
+                                  onTap: () =>
+                                      _saveSidePreference(opt['value']!),
+                                ),
+                              )
                               .toList(),
                         ),
                         const SizedBox(height: 36),
@@ -187,13 +188,15 @@ class _GameSetupScreenState extends ConsumerState<GameSetupScreen> {
                         const SizedBox(height: 12),
                         Column(
                           children: _difficulties
-                              .map((level) => _DifficultyTile(
-                                    level: level,
-                                    color: _difficultyColors[level]!,
-                                    icon: _difficultyIcons[level]!,
-                                    isSelected: _selectedDifficulty == level,
-                                    onTap: () => _saveDifficultyPreference(level),
-                                  ))
+                              .map(
+                                (level) => _DifficultyTile(
+                                  level: level,
+                                  color: _difficultyColors[level]!,
+                                  icon: _difficultyIcons[level]!,
+                                  isSelected: _selectedDifficulty == level,
+                                  onTap: () => _saveDifficultyPreference(level),
+                                ),
+                              )
                               .toList(),
                         ),
                         const SizedBox(height: 40),
@@ -337,15 +340,16 @@ class _DifficultyTile extends StatelessWidget {
                   EngineConfig.labelFor(level),
                   style: TextStyle(
                     color: isSelected ? color : Colors.white,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontWeight: isSelected
+                        ? FontWeight.bold
+                        : FontWeight.normal,
                     fontSize: 15,
                   ),
                 ),
               ],
             ),
             const Spacer(),
-            if (isSelected)
-              Icon(Icons.check_circle, color: color, size: 22),
+            if (isSelected) Icon(Icons.check_circle, color: color, size: 22),
           ],
         ),
       ),

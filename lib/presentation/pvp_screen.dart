@@ -5,7 +5,10 @@ import 'package:enterprise_chess/domain/match_provider.dart';
 import 'package:enterprise_chess/domain/user_settings_provider.dart';
 import 'package:enterprise_chess/presentation/utils/chess_coordinate_utils.dart';
 import 'package:enterprise_chess/presentation/utils/chess_board_builder.dart';
+import 'package:enterprise_chess/domain/game_history_provider.dart';
+import 'package:enterprise_chess/domain/game_history.dart';
 import 'services/sound_service.dart';
+import 'game_review_screen.dart';
 
 /// Two-player local game screen.
 /// Both sides are user-controlled. The board flips after each move so the
@@ -18,15 +21,17 @@ class PvPScreen extends ConsumerStatefulWidget {
 }
 
 class _PvPScreenState extends ConsumerState<PvPScreen> {
+  late GameHistory? _savedHistory;
+
   @override
   void initState() {
     super.initState();
+    _savedHistory = null;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Start a fresh PvP game (no engine moves)
-      ref.read(matchProvider.notifier).startGame(
-            playerSide: 'white',
-            isPve: false,
-          );
+      ref
+          .read(matchProvider.notifier)
+          .startGame(playerSide: 'white', isPve: false);
     });
   }
 
@@ -41,7 +46,7 @@ class _PvPScreenState extends ConsumerState<PvPScreen> {
 
     final state = ref.read(matchProvider);
     final soundController = ref.read(soundServiceProvider);
-    
+
     if (state.lastMoveWasCapture) {
       soundController.playCapture();
     } else {
@@ -58,12 +63,31 @@ class _PvPScreenState extends ConsumerState<PvPScreen> {
     }
   }
 
-  void _showGameOverDialog() {
+  void _showGameOverDialog() async {
     final state = ref.read(matchProvider);
     final isCheckmate = state.isCheckmate;
     final loserIsWhite = state.isWhiteTurn; // the side that got mated
 
+    // Save history
+    final controller = ref.read(matchProvider.notifier);
+    String resultStr = 'Draw';
+    if (isCheckmate) {
+      resultStr = loserIsWhite ? 'Black Wins' : 'White Wins';
+    }
+
+    final history = GameHistory.create(
+      mode: 'PvP',
+      player1: 'White',
+      player2: 'Black',
+      result: resultStr,
+      pgn: controller.pgn,
+    );
+
+    await ref.read(gameHistoryProvider.notifier).saveGame(history);
+    _savedHistory = history;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       showDialog<void>(
         context: context,
         barrierDismissible: false,
@@ -71,13 +95,22 @@ class _PvPScreenState extends ConsumerState<PvPScreen> {
           title: isCheckmate
               ? (loserIsWhite ? 'Black Wins! 🎉' : 'White Wins! 🎉')
               : 'Draw 🤝',
-          subtitle: state.isDraw ? 'Well played, both sides!' : 'Excellent game!',
+          subtitle: state.isDraw
+              ? 'Well played, both sides!'
+              : 'Excellent game!',
           onRestart: () {
             Navigator.of(context).pop(); // close dialog
-            ref.read(matchProvider.notifier).startGame(
-                  playerSide: 'white',
-                  isPve: false,
-                );
+            ref
+                .read(matchProvider.notifier)
+                .startGame(playerSide: 'white', isPve: false);
+          },
+          onReview: () {
+            Navigator.of(context).pop(); // close dialog
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (_) => GameReviewScreen(gameHistory: _savedHistory!),
+              ),
+            );
           },
           onMenu: () {
             Navigator.of(context).pop(); // close dialog
@@ -98,12 +131,14 @@ class _PvPScreenState extends ConsumerState<PvPScreen> {
     final orientWhite = matchState.isWhiteTurn;
     final orientation = orientWhite ? Squares.white : Squares.black;
     final boardState = ChessBoardBuilder.buildBoardState(
-      matchState.fen, 
+      matchState.fen,
       orientation: orientation,
       lastMove: matchState.lastMove,
     );
 
-    final playState = matchState.isGameOver ? PlayState.finished : PlayState.ourTurn;
+    final playState = matchState.isGameOver
+        ? PlayState.finished
+        : PlayState.ourTurn;
 
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
@@ -133,10 +168,9 @@ class _PvPScreenState extends ConsumerState<PvPScreen> {
             icon: const Icon(Icons.refresh),
             tooltip: 'Restart',
             onPressed: () {
-              ref.read(matchProvider.notifier).startGame(
-                    playerSide: 'white',
-                    isPve: false,
-                  );
+              ref
+                  .read(matchProvider.notifier)
+                  .startGame(playerSide: 'white', isPve: false);
             },
           ),
           // ── Settings ──────────────────────────────────────────────────
@@ -180,22 +214,26 @@ class _GameOverDialog extends StatelessWidget {
   final String title;
   final String subtitle;
   final VoidCallback onRestart;
+  final VoidCallback onReview;
   final VoidCallback onMenu;
 
   const _GameOverDialog({
     required this.title,
     required this.subtitle,
     required this.onRestart,
+    required this.onReview,
     required this.onMenu,
   });
 
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      alignment: Alignment.bottomCenter, // Prevent hiding the board
+      insetPadding: const EdgeInsets.all(16).copyWith(bottom: 32),
       backgroundColor: const Color(0xFF1E1E2E),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
-        padding: const EdgeInsets.all(28),
+        padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -212,7 +250,7 @@ class _GameOverDialog extends StatelessWidget {
               subtitle,
               style: const TextStyle(color: Colors.white60, fontSize: 15),
             ),
-            const SizedBox(height: 28),
+            const SizedBox(height: 24),
             Row(
               children: [
                 Expanded(
@@ -222,12 +260,27 @@ class _GameOverDialog extends StatelessWidget {
                       foregroundColor: Colors.white70,
                       side: const BorderSide(color: Colors.white24),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                    child: const Text('Main Menu'),
+                    child: const Text('Menu'),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: onReview,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text('Review'),
+                  ),
+                ),
+                const SizedBox(width: 8),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: onRestart,
@@ -235,9 +288,10 @@ class _GameOverDialog extends StatelessWidget {
                       backgroundColor: Colors.amber,
                       foregroundColor: Colors.black,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                    child: const Text('Play Again'),
+                    child: const Text('Again'),
                   ),
                 ),
               ],

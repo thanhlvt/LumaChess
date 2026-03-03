@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'engine_config.dart';
 
 /// Identifies the game mode selected from the main menu.
-enum GameMode { pve, pvp }
+enum GameMode { pve, pvp, cpu }
 
 /// Holds all configuration choices the player made in the setup screen
 /// before starting a game.

@@ -13,12 +13,17 @@ final chessEngineProvider = Provider<IChessEngine>((ref) {
 class EngineConfigNotifier extends Notifier<EngineConfig> {
   @override
   EngineConfig build() => EngineConfig.fromDifficulty(DifficultyLevel.medium);
+
+  void updateConfig(EngineConfig config) {
+    state = config;
+  }
 }
 
 /// Provider for the current engine configuration.
-final engineConfigProvider = NotifierProvider<EngineConfigNotifier, EngineConfig>(() {
-  return EngineConfigNotifier();
-});
+final engineConfigProvider =
+    NotifierProvider<EngineConfigNotifier, EngineConfig>(() {
+      return EngineConfigNotifier();
+    });
 
 final matchProvider = NotifierProvider<MatchController, MatchState>(() {
   return MatchController();

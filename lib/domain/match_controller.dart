@@ -59,7 +59,7 @@ class MatchController extends Notifier<MatchState> {
     _playerSide = playerSide;
     _isPve = isPve;
     if (config != null) {
-      ref.read(engineConfigProvider.notifier).state = config;
+      ref.read(engineConfigProvider.notifier).updateConfig(config);
     }
     state = _buildState();
   }
@@ -78,7 +78,9 @@ class MatchController extends Notifier<MatchState> {
     final moved = _chess.move({'from': from, 'to': to, 'promotion': promotion});
     if (moved) {
       _fenHistory.add(fenBefore);
-      debugPrint('[MatchController] User move $from$to | FEN#${_fenHistory.length}: $fenBefore');
+      debugPrint(
+        '[MatchController] User move $from$to | FEN#${_fenHistory.length}: $fenBefore',
+      );
       state = _buildState();
       return true;
     }
@@ -112,7 +114,9 @@ class MatchController extends Notifier<MatchState> {
       });
       if (moved) {
         _fenHistory.add(fenBefore);
-        debugPrint('[MatchController] Engine move $from$to | FEN#${_fenHistory.length}: $fenBefore');
+        debugPrint(
+          '[MatchController] Engine move $from$to | FEN#${_fenHistory.length}: $fenBefore',
+        );
         state = _buildState();
       }
     } catch (e) {
@@ -162,10 +166,7 @@ class MatchController extends Notifier<MatchState> {
     if (_legalMovesCache != null) return _legalMovesCache!;
     _legalMovesCache = _chess
         .generate_moves()
-        .map((m) => {
-              'from': m.fromAlgebraic,
-              'to': m.toAlgebraic,
-            })
+        .map((m) => {'from': m.fromAlgebraic, 'to': m.toAlgebraic})
         .toList();
     return _legalMovesCache!;
   }
@@ -201,13 +202,10 @@ class MatchController extends Notifier<MatchState> {
       final chessHistory = _chess.history;
       lastMoveWasCapture = chessHistory.last.move.captured != null;
       final lastM = chessHistory.last.move;
-      
+
       // Grab algebraic 'from' and 'to' properties directly from the move
       if (lastM.fromAlgebraic.isNotEmpty && lastM.toAlgebraic.isNotEmpty) {
-        lastMove = {
-          'from': lastM.fromAlgebraic,
-          'to': lastM.toAlgebraic,
-        };
+        lastMove = {'from': lastM.fromAlgebraic, 'to': lastM.toAlgebraic};
       }
     }
 

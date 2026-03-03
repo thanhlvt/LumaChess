@@ -5,6 +5,8 @@ import 'package:enterprise_chess/domain/game_config.dart';
 import 'game_setup_screen.dart';
 import 'pvp_screen.dart';
 import 'settings_screen.dart';
+import 'cpu_setup_screen.dart';
+import 'history_screen.dart';
 
 /// The first screen the user sees.
 /// Lets them choose between playing vs the computer or a two-player local game.
@@ -58,13 +60,16 @@ class MainMenuScreen extends ConsumerWidget {
                     // Load preferences before showing setup screen
                     final prefs = await SharedPreferences.getInstance();
                     final savedSide = prefs.getString('user_preferred_side');
-                    final savedDiff = prefs.getString('user_preferred_difficulty');
+                    final savedDiff = prefs.getString(
+                      'user_preferred_difficulty',
+                    );
 
                     if (!context.mounted) return;
 
                     // Reset config to defaults before showing setup
-                    ref.read(gameConfigProvider.notifier).update(
-                        const GameConfig(mode: GameMode.pve));
+                    ref
+                        .read(gameConfigProvider.notifier)
+                        .update(const GameConfig(mode: GameMode.pve));
 
                     Navigator.of(context).push(
                       MaterialPageRoute(
@@ -81,14 +86,37 @@ class MainMenuScreen extends ConsumerWidget {
                 // ── 2 Players ────────────────────────────────────────────
                 _MenuButton(
                   icon: Icons.people,
-                  label: '2 Players',
+                  label: '2 Players local',
                   onPressed: () {
-                    ref.read(gameConfigProvider.notifier).update(
-                        const GameConfig(mode: GameMode.pvp));
+                    ref
+                        .read(gameConfigProvider.notifier)
+                        .update(const GameConfig(mode: GameMode.pvp));
                     Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const PvPScreen(),
-                      ),
+                      MaterialPageRoute(builder: (_) => const PvPScreen()),
+                    );
+                  },
+                ),
+                const SizedBox(height: 20),
+
+                // ── CPU vs CPU ───────────────────────────────────────────
+                _MenuButton(
+                  icon: Icons.smart_toy,
+                  label: 'CPU vs CPU',
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const CpuSetupScreen()),
+                    );
+                  },
+                ),
+                const SizedBox(height: 20),
+
+                // ── History ──────────────────────────────────────────────
+                _MenuButton(
+                  icon: Icons.history,
+                  label: 'Game History',
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const HistoryScreen()),
                     );
                   },
                 ),
@@ -99,11 +127,9 @@ class MainMenuScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => const SettingsScreen(),
-            ),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const SettingsScreen()));
         },
         backgroundColor: const Color(0xFF283593),
         foregroundColor: Colors.white,

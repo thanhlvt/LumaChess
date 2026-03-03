@@ -17,7 +17,11 @@ class SettingsScreen extends ConsumerWidget {
     final themes = [
       {'label': 'Blue Grey', 'value': BoardTheme.blueGrey, 'name': 'blueGrey'},
       {'label': 'Brown', 'value': BoardTheme.brown, 'name': 'brown'},
-      {'label': 'Hacker Green', 'value': CustomThemes.hackerGreen, 'name': 'hackerGreen'},
+      {
+        'label': 'Hacker Green',
+        'value': CustomThemes.hackerGreen,
+        'name': 'hackerGreen',
+      },
     ];
 
     // Some preset piece sets to choose from
@@ -54,7 +58,7 @@ class SettingsScreen extends ConsumerWidget {
               final val = themeMap['value'] as BoardTheme;
               final internalName = themeMap['name'] as String;
               final isSelected = settings.theme == val;
-              
+
               return ChoiceChip(
                 label: Text(label),
                 selected: isSelected,
@@ -69,7 +73,7 @@ class SettingsScreen extends ConsumerWidget {
             }).toList(),
           ),
           const SizedBox(height: 36),
-          
+
           const Text(
             'Pieces Style',
             style: TextStyle(
@@ -95,7 +99,9 @@ class SettingsScreen extends ConsumerWidget {
               // The safest non-intrusive way is to just assume they have different default sizes or look at the class name.
               // A simpler way: we'll match by name logic if we had stored the name in the provider, but since we didn't, let's just compare the runtime Type of the piece objects.
               // Actually, PieceSet doesn't expose its name easily so we'll just check if their black king widget toString matches.
-              final isSelected = settings.pieceSet.piece(context, 'k').toString() == val.piece(context, 'k').toString();
+              final isSelected =
+                  settings.pieceSet.piece(context, 'k').toString() ==
+                  val.piece(context, 'k').toString();
 
               return ChoiceChip(
                 label: Text(label),
@@ -110,9 +116,9 @@ class SettingsScreen extends ConsumerWidget {
               );
             }).toList(),
           ),
-          
+
           const SizedBox(height: 48),
-          
+
           // A mini preview board to see the changes instantly
           Center(
             child: SizedBox(

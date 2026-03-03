@@ -29,12 +29,14 @@ void main() async {
     },
   );
 
-  runApp(ProviderScope(
-    overrides: [
-      chessEngineProvider.overrideWithValue(GetIt.I<IChessEngine>()),
-    ],
-    child: const ChessApp(),
-  ));
+  runApp(
+    ProviderScope(
+      overrides: [
+        chessEngineProvider.overrideWithValue(GetIt.I<IChessEngine>()),
+      ],
+      child: const ChessApp(),
+    ),
+  );
 }
 
 class ChessApp extends StatelessWidget {
@@ -53,9 +55,7 @@ class ChessApp extends StatelessWidget {
         scaffoldBackgroundColor: const Color(0xFF121212),
       ),
       home: const MainMenuScreen(),
-      routes: {
-        '/settings': (context) => const SettingsScreen(),
-      },
+      routes: {'/settings': (context) => const SettingsScreen()},
       debugShowCheckedModeBanner: false,
     );
   }

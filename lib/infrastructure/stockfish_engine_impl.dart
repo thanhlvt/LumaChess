@@ -122,7 +122,7 @@ class StockfishEngineImpl implements IChessEngine {
           }
         } catch (_) {}
       }
-      
+
       _bestMoveCompleter = Completer<String>();
 
       _stockfish!.stdin = 'position fen $fen';
@@ -157,8 +157,7 @@ class StockfishEngineImpl implements IChessEngine {
     }
     _bestMoveCompleter = null;
 
-    if (_engineAvailable &&
-        _stockfish?.state.value == StockfishState.ready) {
+    if (_engineAvailable && _stockfish?.state.value == StockfishState.ready) {
       try {
         _stockfish!.dispose();
       } catch (e) {

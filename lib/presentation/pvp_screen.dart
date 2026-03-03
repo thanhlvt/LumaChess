@@ -6,7 +6,6 @@ import 'package:enterprise_chess/domain/user_settings_provider.dart';
 import 'package:enterprise_chess/presentation/utils/chess_coordinate_utils.dart';
 import 'package:enterprise_chess/presentation/utils/chess_board_builder.dart';
 import 'services/sound_service.dart';
-import 'settings_screen.dart';
 
 /// Two-player local game screen.
 /// Both sides are user-controlled. The board flips after each move so the

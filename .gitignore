@@ -56,5 +56,9 @@ analysis_options.yaml
 *.md.resolved
 test_out.txt
 analyze_out*.txt
+analysis_re*.txt
 out*.txt
 out*.json
+flutter_run_log*.txt
+temp_*.txt
+test*.dart

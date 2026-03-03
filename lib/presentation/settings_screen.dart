@@ -15,16 +15,16 @@ class SettingsScreen extends ConsumerWidget {
 
     // Some preset themes to choose from
     final themes = [
-      {'name': 'Blue Grey', 'value': BoardTheme.blueGrey},
-      {'name': 'Brown', 'value': BoardTheme.brown},
-      {'name': 'Hacker Green', 'value': CustomThemes.hackerGreen},
+      {'label': 'Blue Grey', 'value': BoardTheme.blueGrey, 'name': 'blueGrey'},
+      {'label': 'Brown', 'value': BoardTheme.brown, 'name': 'brown'},
+      {'label': 'Hacker Green', 'value': CustomThemes.hackerGreen, 'name': 'hackerGreen'},
     ];
 
     // Some preset piece sets to choose from
     final pieceSets = [
-      {'name': 'Merida', 'value': PieceSet.merida()},
-      {'name': 'Blitz', 'value': CustomPieceSets.blitz},
-      {'name': 'Luma', 'value': CustomPieceSets.luma},
+      {'label': 'Merida', 'value': PieceSet.merida(), 'name': 'merida'},
+      {'label': 'Blitz', 'value': CustomPieceSets.blitz, 'name': 'blitz'},
+      {'label': 'Luma', 'value': CustomPieceSets.luma, 'name': 'luma'},
     ];
 
     return Scaffold(
@@ -50,14 +50,15 @@ class SettingsScreen extends ConsumerWidget {
             spacing: 12,
             runSpacing: 12,
             children: themes.map((themeMap) {
-              final name = themeMap['name'] as String;
+              final label = themeMap['label'] as String;
               final val = themeMap['value'] as BoardTheme;
+              final internalName = themeMap['name'] as String;
               final isSelected = settings.theme == val;
               
               return ChoiceChip(
-                label: Text(name),
+                label: Text(label),
                 selected: isSelected,
-                onSelected: (_) => notifier.updateTheme(val),
+                onSelected: (_) => notifier.updateTheme(val, internalName),
                 backgroundColor: Colors.white12,
                 selectedColor: Colors.amber,
                 labelStyle: TextStyle(
@@ -82,8 +83,9 @@ class SettingsScreen extends ConsumerWidget {
             spacing: 12,
             runSpacing: 12,
             children: pieceSets.map((pieceMap) {
-              final name = pieceMap['name'] as String;
+              final label = pieceMap['label'] as String;
               final val = pieceMap['value'] as PieceSet;
+              final internalName = pieceMap['name'] as String;
               // Compare by checking a property uniquely, or just rely on exact instance if constant.
               // For simplicity, we compare pieceSet names indirectly or use exact reference if possible.
               // Since 'val' is created fresh, equality fails. We can check the source/prefix.
@@ -96,9 +98,9 @@ class SettingsScreen extends ConsumerWidget {
               final isSelected = settings.pieceSet.piece(context, 'k').toString() == val.piece(context, 'k').toString();
 
               return ChoiceChip(
-                label: Text(name),
+                label: Text(label),
                 selected: isSelected,
-                onSelected: (_) => notifier.updatePieceSet(val),
+                onSelected: (_) => notifier.updatePieceSet(val, internalName),
                 backgroundColor: Colors.white12,
                 selectedColor: Colors.amber,
                 labelStyle: TextStyle(

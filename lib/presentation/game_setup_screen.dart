@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:enterprise_chess/domain/game_config.dart';
 import 'package:enterprise_chess/domain/engine_config.dart';
 import 'pve_screen.dart';
@@ -17,6 +18,46 @@ class GameSetupScreen extends ConsumerStatefulWidget {
 class _GameSetupScreenState extends ConsumerState<GameSetupScreen> {
   String _selectedSide = 'white';
   DifficultyLevel _selectedDifficulty = DifficultyLevel.medium;
+
+  static const _sideKey = 'user_preferred_side';
+  static const _difficultyKey = 'user_preferred_difficulty';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPreferences();
+  }
+
+  Future<void> _loadPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedSide = prefs.getString(_sideKey);
+    final savedDiff = prefs.getString(_difficultyKey);
+
+    if (mounted) {
+      setState(() {
+        if (savedSide != null && ['white', 'random', 'black'].contains(savedSide)) {
+          _selectedSide = savedSide;
+        }
+        if (savedDiff != null) {
+          try {
+            _selectedDifficulty = DifficultyLevel.values.firstWhere((e) => e.name == savedDiff);
+          } catch (_) {}
+        }
+      });
+    }
+  }
+
+  Future<void> _saveSidePreference(String side) async {
+    setState(() => _selectedSide = side);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_sideKey, side);
+  }
+
+  Future<void> _saveDifficultyPreference(DifficultyLevel diff) async {
+    setState(() => _selectedDifficulty = diff);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_difficultyKey, diff.name);
+  }
 
   static const _sideOptions = [
     {'value': 'white', 'label': 'White', 'icon': '♔'},
@@ -128,8 +169,7 @@ class _GameSetupScreenState extends ConsumerState<GameSetupScreen> {
                                     label: opt['label']!,
                                     icon: opt['icon']!,
                                     isSelected: _selectedSide == opt['value'],
-                                    onTap: () => setState(
-                                        () => _selectedSide = opt['value']!),
+                                    onTap: () => _saveSidePreference(opt['value']!),
                                   ))
                               .toList(),
                         ),
@@ -153,8 +193,7 @@ class _GameSetupScreenState extends ConsumerState<GameSetupScreen> {
                                     color: _difficultyColors[level]!,
                                     icon: _difficultyIcons[level]!,
                                     isSelected: _selectedDifficulty == level,
-                                    onTap: () => setState(
-                                        () => _selectedDifficulty = level),
+                                    onTap: () => _saveDifficultyPreference(level),
                                   ))
                               .toList(),
                         ),

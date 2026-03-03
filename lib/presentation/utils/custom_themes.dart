@@ -41,13 +41,13 @@ class CustomPieceSets {
   );
 
   static final blitz = PieceSet.fromImageAssets(
-    folder: 'assets/pieces/blitz/',
+    folder: 'assets/images/pieces/blitz/',
     symbols: PieceSet.defaultSymbols, // ['P', 'N', 'B', 'R', 'Q', 'K']
     format: 'png',
   );
 
   static final luma = PieceSet.fromImageAssets(
-    folder: 'assets/pieces/luma/',
+    folder: 'assets/images/pieces/luma/',
     symbols: PieceSet.defaultSymbols, // ['P', 'N', 'B', 'R', 'Q', 'K']
     format: 'png',
   );

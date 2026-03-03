@@ -6,6 +6,7 @@ import 'package:enterprise_chess/domain/i_chess_engine.dart';
 import 'package:enterprise_chess/domain/match_provider.dart';
 import 'package:enterprise_chess/infrastructure/injection.dart';
 import 'package:enterprise_chess/presentation/main_menu_screen.dart';
+import 'package:enterprise_chess/presentation/settings_screen.dart';
 
 // ignore: unused_element
 AppLifecycleListener? _lifecycleListener;
@@ -52,6 +53,9 @@ class ChessApp extends StatelessWidget {
         scaffoldBackgroundColor: const Color(0xFF121212),
       ),
       home: const MainMenuScreen(),
+      routes: {
+        '/settings': (context) => const SettingsScreen(),
+      },
       debugShowCheckedModeBanner: false,
     );
   }

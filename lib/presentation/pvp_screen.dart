@@ -145,11 +145,7 @@ class _PvPScreenState extends ConsumerState<PvPScreen> {
             icon: const Icon(Icons.settings),
             tooltip: 'Settings',
             onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => const SettingsScreen(),
-                ),
-              );
+              Navigator.of(context).pushNamed('/settings');
             },
           ),
         ],

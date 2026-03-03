@@ -9,15 +9,22 @@ import 'pve_screen.dart';
 /// Setup screen shown after the user taps "Play vs Computer".
 /// Allows selection of piece color and difficulty level.
 class GameSetupScreen extends ConsumerStatefulWidget {
-  const GameSetupScreen({super.key});
+  final String? initialSide;
+  final String? initialDifficulty;
+
+  const GameSetupScreen({
+    super.key,
+    this.initialSide,
+    this.initialDifficulty,
+  });
 
   @override
   ConsumerState<GameSetupScreen> createState() => _GameSetupScreenState();
 }
 
 class _GameSetupScreenState extends ConsumerState<GameSetupScreen> {
-  String _selectedSide = 'white';
-  DifficultyLevel _selectedDifficulty = DifficultyLevel.medium;
+  late String _selectedSide;
+  late DifficultyLevel _selectedDifficulty;
 
   static const _sideKey = 'user_preferred_side';
   static const _difficultyKey = 'user_preferred_difficulty';
@@ -25,25 +32,17 @@ class _GameSetupScreenState extends ConsumerState<GameSetupScreen> {
   @override
   void initState() {
     super.initState();
-    _loadPreferences();
-  }
+    
+    _selectedSide = 'white';
+    if (widget.initialSide != null && ['white', 'random', 'black'].contains(widget.initialSide)) {
+      _selectedSide = widget.initialSide!;
+    }
 
-  Future<void> _loadPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedSide = prefs.getString(_sideKey);
-    final savedDiff = prefs.getString(_difficultyKey);
-
-    if (mounted) {
-      setState(() {
-        if (savedSide != null && ['white', 'random', 'black'].contains(savedSide)) {
-          _selectedSide = savedSide;
-        }
-        if (savedDiff != null) {
-          try {
-            _selectedDifficulty = DifficultyLevel.values.firstWhere((e) => e.name == savedDiff);
-          } catch (_) {}
-        }
-      });
+    _selectedDifficulty = DifficultyLevel.medium;
+    if (widget.initialDifficulty != null) {
+      try {
+        _selectedDifficulty = DifficultyLevel.values.firstWhere((e) => e.name == widget.initialDifficulty);
+      } catch (_) {}
     }
   }
 

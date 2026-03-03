@@ -1,3 +1,4 @@
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:enterprise_chess/domain/game_config.dart';
@@ -53,13 +54,24 @@ class MainMenuScreen extends ConsumerWidget {
                 _MenuButton(
                   icon: Icons.computer,
                   label: 'Play vs Computer',
-                  onPressed: () {
+                  onPressed: () async {
+                    // Load preferences before showing setup screen
+                    final prefs = await SharedPreferences.getInstance();
+                    final savedSide = prefs.getString('user_preferred_side');
+                    final savedDiff = prefs.getString('user_preferred_difficulty');
+
+                    if (!context.mounted) return;
+
                     // Reset config to defaults before showing setup
                     ref.read(gameConfigProvider.notifier).update(
                         const GameConfig(mode: GameMode.pve));
+
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (_) => const GameSetupScreen(),
+                        builder: (_) => GameSetupScreen(
+                          initialSide: savedSide,
+                          initialDifficulty: savedDiff,
+                        ),
                       ),
                     );
                   },

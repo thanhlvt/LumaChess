@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:squares/squares.dart';
-import 'package:enterprise_chess/domain/user_settings_provider.dart';
-import 'package:enterprise_chess/presentation/utils/chess_board_builder.dart';
-import 'package:enterprise_chess/presentation/utils/custom_themes.dart';
+import 'package:luma_chess/domain/user_settings_provider.dart';
+import 'package:luma_chess/presentation/utils/chess_board_builder.dart';
+import 'package:luma_chess/presentation/utils/custom_themes.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});

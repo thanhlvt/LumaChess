@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:enterprise_chess/domain/game_config.dart';
-import 'package:enterprise_chess/domain/engine_config.dart';
+import 'package:luma_chess/domain/game_config.dart';
+import 'package:luma_chess/domain/engine_config.dart';
 import 'cpu_vs_cpu_screen.dart';
 
 class CpuSetupScreen extends ConsumerStatefulWidget {

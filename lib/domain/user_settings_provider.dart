@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:squares/squares.dart';
-import 'package:enterprise_chess/presentation/utils/custom_themes.dart';
+import 'package:luma_chess/presentation/utils/custom_themes.dart';
 
 /// Holds the user's visual preferences for the chessboard.
 class UserSettings {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:enterprise_chess/domain/game_history_provider.dart';
+import 'package:luma_chess/domain/game_history_provider.dart';
 import 'game_review_screen.dart';
 
 /// Screen to view past games.

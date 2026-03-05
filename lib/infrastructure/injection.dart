@@ -1,6 +1,6 @@
 import 'package:get_it/get_it.dart';
-import 'package:enterprise_chess/domain/i_chess_engine.dart';
-import 'package:enterprise_chess/infrastructure/stockfish_engine_impl.dart';
+import 'package:luma_chess/domain/i_chess_engine.dart';
+import 'package:luma_chess/infrastructure/stockfish_engine_impl.dart';
 
 final getIt = GetIt.instance;
 

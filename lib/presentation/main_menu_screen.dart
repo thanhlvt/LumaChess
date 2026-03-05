@@ -1,7 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:enterprise_chess/domain/game_config.dart';
+import 'package:luma_chess/domain/game_config.dart';
 import 'game_setup_screen.dart';
 import 'pvp_screen.dart';
 import 'settings_screen.dart';
@@ -33,7 +33,7 @@ class MainMenuScreen extends ConsumerWidget {
                 const Icon(Icons.sports_esports, size: 72, color: Colors.amber),
                 const SizedBox(height: 16),
                 const Text(
-                  '♟ Enterprise Chess',
+                  '♟ LumaChess',
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,

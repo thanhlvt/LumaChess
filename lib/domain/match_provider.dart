@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:enterprise_chess/domain/i_chess_engine.dart';
-import 'package:enterprise_chess/domain/engine_config.dart';
+import 'package:luma_chess/domain/i_chess_engine.dart';
+import 'package:luma_chess/domain/engine_config.dart';
 import 'match_controller.dart';
 import 'match_state.dart';
 

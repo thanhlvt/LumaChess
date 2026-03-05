@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:squares/squares.dart';
-import 'package:enterprise_chess/domain/engine_config.dart';
-import 'package:enterprise_chess/domain/match_provider.dart';
-import 'package:enterprise_chess/domain/user_settings_provider.dart';
-import 'package:enterprise_chess/presentation/utils/chess_coordinate_utils.dart';
-import 'package:enterprise_chess/presentation/utils/chess_board_builder.dart';
-import 'package:enterprise_chess/domain/game_history_provider.dart';
-import 'package:enterprise_chess/domain/game_history.dart';
+import 'package:luma_chess/domain/engine_config.dart';
+import 'package:luma_chess/domain/match_provider.dart';
+import 'package:luma_chess/domain/user_settings_provider.dart';
+import 'package:luma_chess/presentation/utils/chess_coordinate_utils.dart';
+import 'package:luma_chess/presentation/utils/chess_board_builder.dart';
+import 'package:luma_chess/domain/game_history_provider.dart';
+import 'package:luma_chess/domain/game_history.dart';
 import 'services/sound_service.dart';
 import 'game_review_screen.dart';
 

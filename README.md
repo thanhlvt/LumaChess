@@ -1,4 +1,4 @@
-# enterprise_chess
+# luma_chess
 
 A new Flutter project.
 

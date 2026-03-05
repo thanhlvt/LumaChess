@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:enterprise_chess/domain/match_provider.dart';
-import 'package:enterprise_chess/domain/i_chess_engine.dart';
+import 'package:luma_chess/domain/match_provider.dart';
+import 'package:luma_chess/domain/i_chess_engine.dart';
 import 'package:chess/chess.dart' as chess_lib;
 
 class MockChessEngine implements IChessEngine {

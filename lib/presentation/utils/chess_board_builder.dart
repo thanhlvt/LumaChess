@@ -1,5 +1,5 @@
 import 'package:squares/squares.dart';
-import 'package:enterprise_chess/presentation/utils/chess_coordinate_utils.dart';
+import 'package:luma_chess/presentation/utils/chess_coordinate_utils.dart';
 
 class ChessBoardBuilder {
   /// Builds a [BoardState] from a FEN string.

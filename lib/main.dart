@@ -2,11 +2,11 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
-import 'package:enterprise_chess/domain/i_chess_engine.dart';
-import 'package:enterprise_chess/domain/match_provider.dart';
-import 'package:enterprise_chess/infrastructure/injection.dart';
-import 'package:enterprise_chess/presentation/main_menu_screen.dart';
-import 'package:enterprise_chess/presentation/settings_screen.dart';
+import 'package:luma_chess/domain/i_chess_engine.dart';
+import 'package:luma_chess/domain/match_provider.dart';
+import 'package:luma_chess/infrastructure/injection.dart';
+import 'package:luma_chess/presentation/main_menu_screen.dart';
+import 'package:luma_chess/presentation/settings_screen.dart';
 
 // ignore: unused_element
 AppLifecycleListener? _lifecycleListener;
@@ -45,7 +45,7 @@ class ChessApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Enterprise Chess',
+      title: 'LumaChess',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.indigo,
